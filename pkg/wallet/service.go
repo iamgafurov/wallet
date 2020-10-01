@@ -1,13 +1,16 @@
 package wallet
 
-import "github.com/iamgafurov/wallet/pkg/types"
-import "errors"
+import (
+	"github.com/iamgafurov/wallet/pkg/types"
+	"github.com/google/uuid"
+	"errors"
+	)
+
 
 var ErrAccountNotFound = errors.New("account not found")
 type Service struct {
 	accounts []types.Account
 	payments []types.Payment
-	nextAccountID int64
 }
 
 func (s *Service) RegisterAccount(phone types.Phone){
@@ -16,9 +19,9 @@ func (s *Service) RegisterAccount(phone types.Phone){
 			return
 		}
 	}
-	s.nextAccountID++
+	paymentID:= uuid.New().String()
 	s.accounts = append(s.accounts, types.Account{
-		ID: s.nextAccountID,
+		ID: paymentID,
 		Phone: phone,
 		Balance: 0,
 	})
