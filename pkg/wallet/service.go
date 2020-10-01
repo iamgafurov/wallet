@@ -1,6 +1,6 @@
 package wallet
 
-import "wallet/pkg/types"
+import "github.com/iamgafurov/wallet/pkg/types"
 import "errors"
 
 var ErrAccountNotFound = errors.New("account not found")

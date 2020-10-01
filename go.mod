@@ -1,1 +1,1 @@
-module wallet
+module github.com/iamgafurov/wallet
