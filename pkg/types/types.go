@@ -31,7 +31,7 @@ type Category string
 
 type Status string
 type Payment struct {
-	ID int
+	ID string
 	Amount Money
 	Category Category
 	Status Status

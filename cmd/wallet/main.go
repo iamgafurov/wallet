@@ -1,8 +1,8 @@
 package main
 
 import (
-		"github.com/iamgafurov/wallet/pkg/wallet"
-		"github.com/iamgafurov/wallet/pkg/types"
+		"wallet/pkg/wallet"
+		"wallet/pkg/types"
 	 	"fmt"
 		)
 func main(){

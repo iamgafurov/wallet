@@ -21,7 +21,7 @@ func (s *Service) RegisterAccount(phone types.Phone){
 	}
 	paymentID:= uuid.New().String()
 	s.accounts = append(s.accounts, types.Account{
-		ID: paymentID,
+		ID: int64(paymentID),
 		Phone: phone,
 		Balance: 0,
 	})
