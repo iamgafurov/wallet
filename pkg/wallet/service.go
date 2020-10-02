@@ -2,7 +2,6 @@ package wallet
 
 import (
 	"github.com/iamgafurov/wallet/pkg/types"
-	"github.com/google/uuid"
 	"errors"
 	)
 
@@ -14,14 +13,15 @@ type Service struct {
 }
 
 func (s *Service) RegisterAccount(phone types.Phone){
+	nextID := int64(0)
 	for _,account := range s.accounts{
 		if account.Phone == phone{
 			return
 		}
 	}
-	paymentID:= uuid.New().String()
+	nextID++
 	s.accounts = append(s.accounts, types.Account{
-		ID: int64(paymentID),
+		ID: nextID,
 		Phone: phone,
 		Balance: 0,
 	})
