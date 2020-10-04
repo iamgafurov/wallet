@@ -14,4 +14,18 @@ func main(){
 	}else {
 		fmt.Println(account)
 	}
+	err = srv.Deposit(account.ID , types.Money(30_000))
+	if err != nil{
+		fmt.Println(err)
+	}
+	payment,er := srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		fmt.Println(er)
+	}
+	payment,err =srv.Repeat(payment.ID)
+	if err !=nil {
+		fmt.Println(err)
+	}else{
+		fmt.Println(payment)
+	}
 }

@@ -11,9 +11,9 @@ const (
 )
 //Payment Status types
 const (
-	StatusOk Status = "OK"
-	StatusFail Status = "FAIL"
-	StatusInProgress Status = "INPROGRESS"
+	PaymentStatusOk Status = "OK"
+	PaymentStatusFail Status = "FAIL"
+	PaymentStatusInProgress Status = "INPROGRESS"
 )
 type PAN string
 
@@ -27,13 +27,14 @@ type Card struct {
 	Name string
 	Active	bool
 }
-type Category string
+type PaymentCategory string
 
 type Status string
 type Payment struct {
 	ID string
+	AccountID int64
 	Amount Money
-	Category Category
+	Category PaymentCategory
 	Status Status
 }
 type PaymentSource struct {
