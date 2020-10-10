@@ -4,6 +4,11 @@ import (
 	"github.com/iamgafurov/wallet/pkg/types"
 	"github.com/google/uuid"
 	"errors"
+	"io"
+	"os"
+	"log"
+	"strconv"
+	"encoding/json"
 	)
 
 
@@ -18,18 +23,19 @@ type Service struct {
 	accounts []*types.Account
 	payments []*types.Payment
 	favorites []*types.Favorite
+	nextID  int64 
 }
 
 func (s *Service) RegisterAccount(phone types.Phone)(*types.Account,error){
-	nextID := int64(0)
+	
 	for _,account := range s.accounts{
 		if account.Phone == phone{
 			return nil, ErrPhoneExist
 		}
 	}
-	nextID++
+	s.nextID++
 	newAccount := &types.Account{
-		ID: nextID,
+		ID: s.nextID,
 		Phone: phone,
 		Balance: 0,
 	}
@@ -168,4 +174,64 @@ func (s *Service) PayFromFavorite(favoriteID string) (*types.Payment,error){
 		return nil,err
 	}
 	return payment,nil
+}
+
+func (s *Service) ImportFromFile(path string) error{
+	file,err := os.Open(path)
+	if err != nil{
+		return err
+	}	
+
+	content := make([]byte,8096)
+	buf := make([]byte,4096)
+	for {
+		read,err:= file.Read(buf)
+		
+		if err == io.EOF {
+			break
+		}
+		if err != nil{
+			log.Print(err)
+			return err
+		}
+		content = append(content,buf[:read]...)
+	}
+	var dat map[string]interface{}
+	
+	err= json.Unmarshal(content,&dat)
+	if err != nil {
+		print(err,"3234324")
+		return err
+	}
+	log.Print(dat)
+	return nil
+}
+
+func (s *Service) ExportToFile(path string) error{
+	_,err := os.Create(path)
+	if err !=nil {
+		log.Print(err)
+		return err
+	}
+	file,err := os.OpenFile(path,os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	if err != nil{
+		log.Print(err)
+		return err
+	}
+	data:= ""
+	for _,account:= range s.accounts{
+		data += strconv.FormatInt(account.ID,10) + ";" + string(account.Phone) + ";" + strconv.FormatInt(int64(account.Balance),10)+ "|"
+	}
+	_,err = file.Write([]byte(data)) 
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+	defer func(){
+		err := file.Close()
+		if err != nil {
+			log.Print(err)
+		}
+	}()
+	return nil
 }

@@ -43,12 +43,12 @@ type PaymentSource struct {
 	Balance Money // баланс в дирамах
    }
 
-type Phone string
+type Phone string 
 
 type Account struct {
-	ID int64
-	Phone Phone 
-	Balance Money
+	ID int64 `json: iD`
+	Phone Phone 	`json: phone`
+	Balance Money	`json: balance`
 } 
 
 type Favorite struct {

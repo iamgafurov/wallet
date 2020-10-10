@@ -2,11 +2,13 @@ package wallet
 import (
 	"github.com/iamgafurov/wallet/pkg/types"
 	"testing"
+	//"os"
+	
 	)
 		
 func TestService_Repeat_success(t *testing.T){
 	srv := &Service{}
-	srv.RegisterAccount(types.Phone("90999390"))
+	srv.RegisterAccount(types.Phone("9099343490"))
 	account,err := srv.FindAccountByID(1)
 	if err != nil {
 		t.Errorf("Repeat(): cant't register account,error = %v",err)
@@ -117,4 +119,22 @@ func TestService_FindFavoriteByID_success(t *testing.T){
 	if err !=nil {
 		t.Errorf("Favorite(): cant't Favorite,error = %v",err)
 	} 
+}
+
+
+func TestService_ExportToFile_success(t *testing.T){
+	srv := &Service{}
+	srv.RegisterAccount(types.Phone("90999390"))
+	srv.RegisterAccount(types.Phone("909993210"))
+	srv.RegisterAccount(types.Phone("90999323490"))
+	srv.RegisterAccount(types.Phone("9099939220"))
+	_,err := srv.FindAccountByID(1)
+	if err != nil {
+		t.Errorf("Favorite(): cant't register account,error = %v",err)
+	}
+	
+	err = srv.ExportToFile("dump.txt")
+	if err !=nil {
+		t.Errorf("ExporrtToFile():,error = %v",err)
+	}
 }
