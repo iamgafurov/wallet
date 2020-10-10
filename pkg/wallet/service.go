@@ -4,11 +4,10 @@ import (
 	"github.com/iamgafurov/wallet/pkg/types"
 	"github.com/google/uuid"
 	"errors"
-	"io"
 	"os"
 	"log"
 	"strconv"
-	"encoding/json"
+	"strings"
 	)
 
 
@@ -181,29 +180,30 @@ func (s *Service) ImportFromFile(path string) error{
 	if err != nil{
 		return err
 	}	
-
-	content := make([]byte,8096)
 	buf := make([]byte,4096)
-	for {
-		read,err:= file.Read(buf)
-		
-		if err == io.EOF {
-			break
-		}
-		if err != nil{
-			log.Print(err)
-			return err
-		}
-		content = append(content,buf[:read]...)
-	}
-	var dat map[string]interface{}
-	
-	err= json.Unmarshal(content,&dat)
-	if err != nil {
-		print(err,"3234324")
+	read,err:= file.Read(buf)
+	if err != nil{
+		log.Print(err)
 		return err
 	}
-	log.Print(dat)
+	accounts := strings.Split(string(buf[:read]),"|")
+	accounts = accounts[:len(accounts)-1]
+	for _,account := range accounts{
+		val := strings.Split(account,";")
+		id, err := strconv.ParseInt(val[0],10,64)
+		if err != nil {
+			return err
+		}
+		balance,err := strconv.ParseInt(val[2],10,64)
+		if err != nil {
+			return err
+		}
+		s.accounts = append(s.accounts,&types.Account{
+			ID:      id,
+			Phone:   types.Phone(val[1]),
+			Balance: types.Money(balance),
+		})
+	}
 	return nil
 }
 
