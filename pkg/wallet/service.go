@@ -9,6 +9,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	//"path/filepath"
 	)
 
 
@@ -238,13 +239,9 @@ func (s *Service) ExportToFile(path string) error{
 }
 
 func (s *Service)Export(dir string)error {
-	err := os.Chdir(dir)
-	if err != nil {
-		log.Print(err)
-		return err
-	}
+	
 	if len(s.accounts) != 0 {
-		_,err := os.Create(dir + "accounts.dump")
+		_,err := os.Create(dir +"/accounts.dump")
 		if err != nil {
 			log.Print(err)
 			return err
@@ -253,26 +250,26 @@ func (s *Service)Export(dir string)error {
 		for _,account:= range s.accounts{
 			accountsData += strconv.FormatInt(account.ID,10) + ";" + string(account.Phone) + ";" + strconv.FormatInt(int64(account.Balance),10)+ "|"
 		}
-		err = ioutil.WriteFile("accounts.dump", []byte(accountsData), 0666)
+		err = ioutil.WriteFile(dir + "/accounts.dump", []byte(accountsData), 0666)
 	}
 	if len(s.favorites) != 0{
-		_,err := os.Create("favorites.dump")
+		_,err := os.Create(dir + "/favorites.dump")
 		if err != nil {
 			log.Print(err)
 			return err
 		}
 		favoritesData:= ""
 		for _,favorite:= range s.favorites{
-			favoritesData += favorite.ID + strconv.FormatInt(favorite.AccountID,10) + ";" + favorite.Name + ";" + strconv.FormatInt(int64(favorite.Amount),10)+ ";" + string(favorite.Category) + "|"
+			favoritesData += favorite.ID + ";" + strconv.FormatInt(favorite.AccountID,10) + ";" + favorite.Name + ";" + strconv.FormatInt(int64(favorite.Amount),10)+ ";" + string(favorite.Category) + "|"
 		}
-		err = ioutil.WriteFile("favorites.dump", []byte(favoritesData), 0666)
+		err = ioutil.WriteFile(dir + "/favorites.dump", []byte(favoritesData), 0666)
 		if err != nil {
 			log.Print(err)
 			return err
 		}
 	}
 	if len(s.payments)!= 0{
-		_,err := os.Create("payments.dump")
+		_,err := os.Create(dir +"/payments.dump")
 		if err != nil {
 			log.Print(err)
 			return err
@@ -280,9 +277,9 @@ func (s *Service)Export(dir string)error {
 		
 		paymentsData:= ""
 		for _,payment:= range s.payments{
-			paymentsData += payment.ID + strconv.FormatInt(payment.AccountID,10)  + ";" + strconv.FormatInt(int64(payment.Amount),10)+ ";" + string(payment.Category)+ ";" + string(payment.Status)+"|"
+			paymentsData += payment.ID +";"+ strconv.FormatInt(payment.AccountID,10)  + ";" + strconv.FormatInt(int64(payment.Amount),10)+ ";" + string(payment.Category)+ ";" + string(payment.Status)+"|"
 		}
-		err = ioutil.WriteFile("payments.dump", []byte(paymentsData), 0666)
+		err = ioutil.WriteFile(dir + "/payments.dump", []byte(paymentsData), 0666)
 		if err != nil {
 			log.Print(err)
 			return err
@@ -294,13 +291,9 @@ func (s *Service)Export(dir string)error {
 
 
 func (s *Service) Import(dir string)error {
-	err := os.Chdir(dir)
-	if err != nil {
-		log.Print(err)
-		return err
-	}
+	
 
-	accountsData,err := ioutil.ReadFile("accounts.dump")
+	accountsData,err := ioutil.ReadFile(dir + "/accounts.dump")
 	if err == nil{
 		accounts := strings.Split(string(accountsData),"|")
 		accounts = accounts[:len(accounts)-1]
@@ -328,7 +321,7 @@ func (s *Service) Import(dir string)error {
 		}
 	}
 
-	paymentsData,err := ioutil.ReadFile("payments.dump")
+	paymentsData,err := ioutil.ReadFile(dir + "/payments.dump")
 	if err == nil{
 		payments := strings.Split(string(paymentsData),"|")
 		payments = payments[:len(payments)-1]
@@ -363,7 +356,7 @@ func (s *Service) Import(dir string)error {
 	}
 
 
-	favoritesData,err := ioutil.ReadFile("favorites.dump")
+	favoritesData,err := ioutil.ReadFile(dir + "/favorites.dump")
 	if err == nil{
 		favorites := strings.Split(string(favoritesData),"|")
 		favorites = favorites[:len(favorites)-1]
