@@ -392,3 +392,65 @@ func (s *Service) Import(dir string)error {
 	return nil
 
 }
+
+func (s *Service) ExportAccountHistory(accountID int64) ([]types.Payment,error){
+	result := []types.Payment{}
+	for _,payment := range s.payments {
+		if payment.AccountID == accountID {
+			result = append(result,*payment)
+		}
+	}
+	if len(result) ==0 {
+		return nil,ErrAccountNotFound
+	}
+	return result,nil
+}
+
+func (s *Service) HistoryToFiles(payments []types.Payment,dir string ,records int) error{
+	num :=1
+	i:=0
+	if len(payments) == 0{
+		return nil
+	}
+	if len(payments) <= records {
+		err:= s.ExportHistoryToFile(payments,dir+"/payments" + ".dump")
+		if err != nil {
+			log.Print(err)
+			return err
+		}else {
+			return nil
+		}
+	}
+	for i=0;i + records<len(payments);i+=records {
+		err:= s.ExportHistoryToFile(payments[i:i+records],dir+"/payments"+strconv.Itoa(num) + ".dump")
+		if err != nil {
+			log.Print(err)
+			return err
+		}
+		num++
+	}
+	err:= s.ExportHistoryToFile(payments[i:],dir+"/payments"+strconv.Itoa(num) + ".dump")
+		if err != nil {
+			log.Print(err)
+			return err
+		}
+	return nil
+}
+
+func (s *Service) ExportHistoryToFile(payments []types.Payment, name string)error{
+	_,err := os.Create(name)
+		if err != nil {
+			log.Print(err)
+			return err
+		}
+	paymentsData:= ""
+	for _,payment:= range payments{
+		paymentsData += payment.ID +";"+ strconv.FormatInt(payment.AccountID,10)  + ";" + strconv.FormatInt(int64(payment.Amount),10)+ ";" + string(payment.Category)+ ";" + string(payment.Status)+"\n"
+	}
+	err = ioutil.WriteFile(name, []byte(paymentsData), 0666)
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+	return nil
+}
