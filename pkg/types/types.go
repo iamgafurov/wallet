@@ -46,9 +46,9 @@ type PaymentSource struct {
 type Phone string 
 
 type Account struct {
-	ID int64 `json: iD`
-	Phone Phone 	`json: phone`
-	Balance Money	`json: balance`
+	ID int64 
+	Phone Phone 	
+	Balance Money	
 } 
 
 type Favorite struct {
