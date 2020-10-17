@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	//"fmt"
 	)
 
 
@@ -498,4 +499,104 @@ func (s *Service) ExportHistoryToFile(payments []types.Payment, name string)erro
 	}
 	return nil
 
+}
+
+
+func (s *Service) FilterPayments(accountID int64,gorutines int)([]types.Payment,error){
+	wg := sync.WaitGroup{}
+	mu := sync.Mutex{}
+	pays := []types.Payment{}
+	kol:=0
+	i:=0
+	if gorutines == 0{
+		kol= len(s.payments)
+	}else{
+		kol= int(len(s.payments)/gorutines)
+	}
+	for i=0;i<gorutines-1;i++{
+		wg.Add(1)
+		go func (index int){
+			defer wg.Done()
+			result:=[]types.Payment{}
+			payments := s.payments[index*kol:(index+1) * kol]
+			for _,payment := range payments{
+				if payment.AccountID == accountID {
+					result = append(result,*payment)
+				}
+			}
+			mu.Lock()
+			pays = append(pays,result...)
+			mu.Unlock()
+		}(i)
+	}
+	wg.Add(1)
+		go func (){
+			defer wg.Done()
+			result:=[]types.Payment{}
+			payments := s.payments[i*kol:]
+			for _,payment := range payments{
+				if payment.AccountID == accountID {
+					result = append(result,*payment)
+				}
+			}
+			mu.Lock()
+			pays = append(pays,result...)
+			mu.Unlock()
+
+		}()
+	wg.Wait()	
+	if len(pays) == 0{
+		return nil,ErrAccountNotFound
+	}
+	return pays,nil
+}
+
+
+func (s *Service) FilterPaymentsByFn(filter func(payment types.Payment)bool,gorutines int)([]types.Payment,error){
+	wg := sync.WaitGroup{}
+	mu := sync.Mutex{}
+	pays := []types.Payment{}
+	kol:=0
+	i:=0
+	if gorutines == 0{
+		kol= len(s.payments)
+	}else{
+		kol= int(len(s.payments)/gorutines)
+	}
+	for i=0;i<gorutines-1;i++{
+		wg.Add(1)
+		go func (index int){
+			defer wg.Done()
+			result:=[]types.Payment{}
+			payments := s.payments[index*kol:(index+1) * kol]
+			for _,payment := range payments{
+				if filter(*payment) {
+					result = append(result,*payment)
+				}
+			}
+			mu.Lock()
+			pays = append(pays,result...)
+			mu.Unlock()
+		}(i)
+	}
+	wg.Add(1)
+		go func (){
+			defer wg.Done()
+			result:=[]types.Payment{}
+			payments := s.payments[i*kol:]
+			for _,payment := range payments{
+				if filter(*payment) {
+					result = append(result,*payment)
+				}
+			}
+			mu.Lock()
+			pays = append(pays,result...)
+			mu.Unlock()
+
+		}()
+	wg.Wait()	
+	if len(pays) == 0{
+		return nil,ErrAccountNotFound
+	}
+	return pays,nil
 }
