@@ -153,3 +153,16 @@ func TestService_ImportFromFile_success(t *testing.T){
 	}
 
 }
+
+func TestService_SumPayments_success(t *testing.T){
+	srv := &Service{}
+	err := srv.ImportFromFile("dump.txt")
+	if err !=nil {
+		t.Errorf("ExporrtToFile():,error = %v",err)
+	}
+	_,err = srv.FindAccountByID(1)
+
+	if err !=nil {
+		t.Errorf("ExporrtToFile():,error = %v",err)
+	}
+}

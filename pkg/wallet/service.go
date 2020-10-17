@@ -8,6 +8,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"sync"
 	)
 
 
@@ -234,4 +235,48 @@ func (s *Service) ExportToFile(path string) error{
 		}
 	}()
 	return nil
+}
+
+func (s *Service) SumPayments(gorutines int)types.Money{
+	wg := sync.WaitGroup{}
+	mu := sync.Mutex{}
+	sum:=int64(0)
+	kol:=0
+	i:=0
+	if gorutines == 0{
+		kol= len(s.payments)
+	}else{
+		kol= int(len(s.payments)/gorutines)
+	}
+	for i=0;i<gorutines-1;i++{
+		wg.Add(1)
+		go func (index int){
+			defer wg.Done()
+			val:=int64(0)
+			payments := s.payments[index*kol:(index+1) * kol]
+			for _,payment := range payments{
+				val +=  int64(payment.Amount)
+			}
+			mu.Lock()
+			sum+= val;
+			mu.Unlock()
+
+		}(i)
+	}
+	wg.Add(1)
+		go func (){
+			defer wg.Done()
+			val:=int64(0)
+			payments := s.payments[i:]
+			for _,payment := range payments{
+				val +=  int64(payment.Amount)
+			}
+			mu.Lock()
+			sum+= val;
+			mu.Unlock()
+
+		}()
+	wg.Wait()	
+	println(sum)
+	return types.Money(sum)
 }
