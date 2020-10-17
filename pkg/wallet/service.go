@@ -238,7 +238,7 @@ func (s *Service) ExportToFile(path string) error{
 	return nil
 }
 
-<<<<<<< HEAD
+
 func (s *Service) SumPayments(gorutines int)types.Money{
 	wg := sync.WaitGroup{}
 	mu := sync.Mutex{}
@@ -269,7 +269,7 @@ func (s *Service) SumPayments(gorutines int)types.Money{
 		go func (){
 			defer wg.Done()
 			val:=int64(0)
-			payments := s.payments[i:]
+			payments := s.payments[i*kol:]
 			for _,payment := range payments{
 				val +=  int64(payment.Amount)
 			}
@@ -279,8 +279,8 @@ func (s *Service) SumPayments(gorutines int)types.Money{
 
 		}()
 	wg.Wait()	
-	println(sum)
 	return types.Money(sum)
+}
 
 func (s *Service)Export(dir string)error {
 	
