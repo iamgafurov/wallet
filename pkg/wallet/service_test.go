@@ -392,3 +392,74 @@ func TestService_SumPayments_success(t *testing.T){
 	//fmt.Print(*srv.accounts[3],*srv.payments[0])
 
 }
+
+
+
+func BenchmarkSumPayments(b *testing.B){
+	srv := &Service{}
+	srv.RegisterAccount(types.Phone("90999390"))
+	srv.RegisterAccount(types.Phone("909993210"))
+	srv.RegisterAccount(types.Phone("90999323490"))
+	srv.RegisterAccount(types.Phone("9099939220"))
+	account,err := srv.FindAccountByID(1)
+	if err != nil {
+		b.Fatalf("Favorite(): cant't register account,error = %v",err)
+	}
+	err = srv.Deposit(account.ID , types.Money(30_000))
+	if err != nil{
+		b.Fatalf("Favorite(): deposit,error = %v",err)
+	}
+	payment,er := srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		b.Fatalf("Favorite(): cant't pay,error = %v",err)
+	}
+	payment,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		b.Fatalf("Favorite(): cant't pay,error = %v",err)
+	}
+	payment,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		b.Fatalf("Favorite(): cant't pay,error = %v",err)
+	}
+	payment,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		b.Fatalf("Favorite(): cant't pay,error = %v",err)
+	}
+	payment,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		b.Fatalf("Favorite(): cant't pay,error = %v",err)
+	}
+	payment,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		b.Fatalf("Favorite(): cant't pay,error = %v",err)
+	}
+	payment,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		b.Fatalf("Favorite(): cant't pay,error = %v",err)
+	}
+	payment,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		b.Fatalf("Favorite(): cant't pay,error = %v",err)
+	}
+	
+	favorite,er :=srv.FavoritePayment(payment.ID,"test name")
+	if er !=nil {
+		b.Fatalf("Favorite(): cant't Favorite,error = %v",err)
+	}
+	_,err =srv.FindFavoriteByID(favorite.ID)
+	if err !=nil {
+		b.Fatalf("Favorite(): cant't Favorite,error = %v",err)
+	} 
+	_,err = srv.ExportAccountHistory(int64(1))
+	if err !=nil {
+		b.Fatalf("ExporrtToFile():,error = %v",err)
+	}
+
+	for i:=0;i<b.N;i++{
+		sum:= srv.SumPayments(0)
+		if sum != types.Money(800) {
+			b.Fatalf("Incorrect result, want %v, got: %v",800,sum)
+		} 
+	} 
+	
+}
