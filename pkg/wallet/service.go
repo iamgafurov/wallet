@@ -557,7 +557,7 @@ func (s *Service) FilterPaymentsByFn(filter func(payment types.Payment)bool,goru
 	mu := sync.Mutex{}
 	pays := []types.Payment{}
 	kol:=0
-	i:=0
+	i:=0 
 	if gorutines == 0{
 		kol= len(s.payments)
 	}else{
