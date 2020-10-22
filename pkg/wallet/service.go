@@ -625,7 +625,7 @@ func (s *Service) SumPaymentsWithProgress() <- chan types.Progress{
 			default:
 				fmt.Println("no Progress received")
 			}
-			ch <- types.Progress{0,sum.Result + types.Money(val)}
+			ch <- types.Progress{Part: 0, Result: sum.Result + types.Money(val)}
 		}(i)
 	}
 
@@ -639,11 +639,11 @@ func (s *Service) SumPaymentsWithProgress() <- chan types.Progress{
 			}
 			select {
 			case sum = <-ch:
-				fmt.Println("received message", sum)
+				fmt.Println("received Progress", sum)
 			default:
-				fmt.Println("no message received")
+				fmt.Println("no Progress received")
 			}
-			ch <- types.Progress{0,sum.Result + types.Money(val)}
+			ch <- types.Progress{Part: 0, Result: sum.Result + types.Money(val)}
 		}()
 	wg.Wait()	
 	return ch
