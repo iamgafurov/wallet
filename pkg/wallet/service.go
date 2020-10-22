@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	//"fmt"
+	"fmt"
 	)
 
 
@@ -599,4 +599,52 @@ func (s *Service) FilterPaymentsByFn(filter func(payment types.Payment)bool,goru
 		return nil,ErrAccountNotFound
 	}
 	return pays,nil
+}
+
+
+func (s *Service) SumPaymentsWithProgress() <- chan types.Progress{
+	wg := sync.WaitGroup{}
+	ch := make(chan types.Progress,1)
+	defer close(ch)
+	partsLen := 100_000
+	i:=0
+	var sum types.Progress
+	gorutines := int(len(s.payments)/partsLen)
+	for i=0;i<gorutines-1;i++{
+		wg.Add(1)
+		go func(index int){
+			defer wg.Done()
+			val:=int64(0)
+			payments := s.payments[index*partsLen:(index+1) * partsLen]
+			for _,payment := range payments{
+				val +=  int64(payment.Amount)
+			}
+			select {
+			case sum = <-ch:
+				fmt.Println("received Progress", sum)
+			default:
+				fmt.Println("no Progress received")
+			}
+			ch <- types.Progress{0,sum.Result + types.Money(val)}
+		}(i)
+	}
+
+	wg.Add(1)
+		go func(){
+			defer wg.Done()
+			val:=int64(0)
+			payments := s.payments[i*partsLen:]
+			for _,payment := range payments{
+				val +=  int64(payment.Amount)
+			}
+			select {
+			case sum = <-ch:
+				fmt.Println("received message", sum)
+			default:
+				fmt.Println("no message received")
+			}
+			ch <- types.Progress{0,sum.Result + types.Money(val)}
+		}()
+	wg.Wait()	
+	return ch
 }

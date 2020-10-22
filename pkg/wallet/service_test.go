@@ -393,6 +393,63 @@ func TestService_SumPayments_success(t *testing.T){
 
 }
 
+func TestService_SumPaymentsWithProgress(t *testing.T){
+	srv := &Service{}
+	srv.RegisterAccount(types.Phone("90999390"))
+	srv.RegisterAccount(types.Phone("909993210"))
+	srv.RegisterAccount(types.Phone("90999323490"))
+	srv.RegisterAccount(types.Phone("9099939220"))
+	account,err := srv.FindAccountByID(1)
+	if err != nil {
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	}
+	err = srv.Deposit(account.ID , types.Money(30_000))
+	if err != nil{
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	}
+	_,er := srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	}
+	_,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	}
+	_,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	}
+	_,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	}
+	_,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	}
+	_,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	}
+	_,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	}
+	_,er = srv.Pay(account.ID,types.Money(100),types.PaymentCategory("food"))
+	if er !=nil {
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	}
+	
+	
+	var res types.Progress
+	ch :=srv.SumPaymentsWithProgress()
+	res = <-ch
+	if res.Result ==0 {
+		t.Errorf("Favorite(): cant't pay,error = %v",err)
+	} 
+	print(res.Result)
+	 	
+}
 
 
 func BenchmarkSumPayments(b *testing.B){
@@ -534,3 +591,4 @@ func BenchmarkFilterPayments(b *testing.B){
 	} 
 	
 }
+
